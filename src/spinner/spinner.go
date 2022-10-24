@@ -15,11 +15,11 @@ type Spinner struct {
 	err      error
 }
 
-func (m Spinner) Init() tea.Cmd {
+func (m *Spinner) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m Spinner) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *Spinner) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -41,7 +41,7 @@ func (m Spinner) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m Spinner) View() string {
+func (m *Spinner) View() string {
 	if m.err != nil {
 		return m.err.Error()
 	}
@@ -51,7 +51,7 @@ func (m Spinner) View() string {
 	}
 	return str
 }
-func (m Spinner) Tick() {
+func (m *Spinner) Tick() {
 	m.spinner.Tick()
 }
 func New() Spinner {

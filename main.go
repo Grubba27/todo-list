@@ -90,7 +90,7 @@ func (m *Model) initList(width, height int) {
 
 	m.lists[t.Done].Title = "Done"
 	m.lists[t.Done].SetItems([]list.Item{
-		t.New(t.Done, "Drink Coffee", "spicy coffee"),
+		t.New(t.Done, "Drink Coffee", "just coffee"),
 	})
 
 }
