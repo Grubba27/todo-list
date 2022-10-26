@@ -1,22 +1,23 @@
 package task
 
-type Status int
+type Column int
 
-const Padding = 4
+const Padding = 3
 
 const (
-	Todo Status = iota
+	Todo Column = iota
 	InProgress
 	Done
 )
 
 type Task struct {
-	Status      Status
+	index       int
+	Status      Column
 	title       string
 	description string
 }
 
-func New(status Status, title string, description string) Task {
+func New(status Column, title string, description string) Task {
 	return Task{Status: status, title: title, description: description}
 }
 

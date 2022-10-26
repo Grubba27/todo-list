@@ -2,13 +2,15 @@ package spinner
 
 import (
 	"fmt"
+
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"time"
 )
 
 type errMsg error
-
+type TickMsg time.Time
 type Spinner struct {
 	spinner  spinner.Model
 	quitting bool
@@ -16,7 +18,13 @@ type Spinner struct {
 }
 
 func (m *Spinner) Init() tea.Cmd {
-	return m.spinner.Tick
+	return m.InitTick()
+}
+
+func (m *Spinner) InitTick() tea.Cmd {
+	return tea.Tick(time.Second/5, func(t time.Time) tea.Msg {
+		return m.spinner.Tick
+	})
 }
 
 func (m *Spinner) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -29,6 +37,9 @@ func (m *Spinner) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		default:
 			return m, nil
 		}
+	case TickMsg:
+		// Return your Tick command again to loop.
+		return m, m.InitTick()
 
 	case errMsg:
 		m.err = msg
