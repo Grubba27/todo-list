@@ -1,10 +1,11 @@
 package app
 
 import (
+	"fmt"
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	s "todo-list/src/spinner"
 	t "todo-list/src/task"
 )
 
@@ -35,13 +36,16 @@ type App struct {
 	lists     []list.Model
 	err       error
 	isLoading bool
-	Spinner   s.Spinner
+	Spinner   spinner.Model
 	quitting  bool
 	showRaw   bool
 }
 
 func New() *App {
-	return &App{isLoading: true, quitting: false, Spinner: s.New()}
+	spin := spinner.New()
+	spin.Spinner = spinner.Dot
+	spin.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+	return &App{isLoading: true, quitting: false, Spinner: spin}
 }
 func (m *App) GetSelectedTask() t.Task {
 	selectedItem := m.lists[m.focused].SelectedItem()
@@ -99,7 +103,7 @@ func (m *App) Prev() {
 		m.focused--
 	}
 }
-func (m *App) initList(width, height int) {
+func (m *App) initList(width, height int, finished func()) {
 	defaultList := list.New(
 		[]list.Item{},
 		list.NewDefaultDelegate(),
@@ -124,22 +128,23 @@ func (m *App) initList(width, height int) {
 	m.lists[t.Done].SetItems([]list.Item{
 		t.New(t.Done, "Drink Coffee", "just coffee"),
 	})
-
+	finished()
 }
 func (m *App) Refresh(list []list.Model) {
 	m.lists = list
 }
 
 func (m *App) Init() tea.Cmd {
-	m.initList(InitWidth, InitHeight)
-	return nil
+	m.initList(InitWidth, InitHeight, func() {})
+	return m.Spinner.Tick
 }
 func (m *App) View() string {
 	if m.quitting {
 		return "Bye!"
 	}
+
 	if m.isLoading {
-		return m.Spinner.View()
+		return fmt.Sprintf("\n\n  %s  loading... \n\n", m.Spinner.View())
 	}
 
 	todoView := m.lists[t.Todo].View()
@@ -178,8 +183,14 @@ func (m *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		focusedStyle.Width(msg.Width / t.Padding)
 		columnStyle.Height(msg.Height - t.Padding)
 		focusedStyle.Height(msg.Height - t.Padding)
-		m.initList(msg.Width, msg.Height)
-		m.isLoading = false
+		go m.initList(msg.Width, msg.Height, func() {
+			m.isLoading = false
+		})
+		if m.isLoading {
+			var cmd tea.Cmd
+			m.Spinner, cmd = m.Spinner.Update(msg)
+			return m, cmd
+		}
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
@@ -229,12 +240,14 @@ func (m *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case t.Task:
 		task := msg
 		return m, m.lists[m.focused].InsertItem(len(m.lists[task.Status].Items()), task)
-
 	}
 
 	if m.isLoading {
-		return m.Spinner.Update(msg)
+		var cmd tea.Cmd
+		m.Spinner, cmd = m.Spinner.Update(msg)
+		return m, cmd
 	}
+
 	var cmd tea.Cmd
 	m.lists[m.focused], cmd = m.lists[m.focused].Update(msg)
 	return m, cmd
