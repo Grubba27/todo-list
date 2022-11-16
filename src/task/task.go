@@ -1,5 +1,7 @@
 package task
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type Column int
 
 const Padding = 3
@@ -11,6 +13,7 @@ const (
 )
 
 type Task struct {
+	ID          primitive.ObjectID
 	index       int
 	Status      Column
 	title       string
@@ -21,8 +24,8 @@ func New(status Column, title string, description string) Task {
 	return Task{Status: status, title: title, description: description}
 }
 
-func NewWithIndex(status Column, title string, description string, index int) Task {
-	return Task{Status: status, title: title, description: description, index: index}
+func NewWithIndex(status Column, title string, description string, index int, ID primitive.ObjectID) Task {
+	return Task{Status: status, title: title, description: description, index: index, ID: ID}
 }
 
 func (t Task) FilterValue() string {

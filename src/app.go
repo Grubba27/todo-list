@@ -114,6 +114,7 @@ func (m *App) DeleteTask() t.Task {
 	selectedTask := m.GetSelectedTask()
 	m.lists[selectedTask.Status].
 		RemoveItem(m.lists[m.focused].Index())
+	db.DeleteTaskByID(selectedTask.ID)
 	return selectedTask
 }
 func (m *App) MoveDown() tea.Msg {
@@ -143,6 +144,7 @@ func (m *App) MoveToNext() tea.Msg {
 			len(m.lists[selectedTask.Status].Items())-1,
 			list.Item(selectedTask),
 		)
+	db.InsertTask(len(m.lists[selectedTask.Status].Items())-1, selectedTask)
 	return nil
 }
 
@@ -377,6 +379,7 @@ func (m *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case t.Task:
 		task := msg
+		db.InsertTask(len(m.lists[task.Status].Items()), task)
 		return m, m.lists[m.focused].InsertItem(len(m.lists[task.Status].Items()), task)
 	}
 
