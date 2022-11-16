@@ -21,6 +21,10 @@ func New(status Column, title string, description string) Task {
 	return Task{Status: status, title: title, description: description}
 }
 
+func NewWithIndex(status Column, title string, description string, index int) Task {
+	return Task{Status: status, title: title, description: description, index: index}
+}
+
 func (t Task) FilterValue() string {
 	return t.title
 }

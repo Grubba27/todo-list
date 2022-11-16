@@ -10,6 +10,7 @@ import (
 
 func main() {
 	app := a.New()
+
 	form := a.NewForm(t.Todo)
 	a.Models = []tea.Model{app, form}
 	m := a.Models[a.Column]

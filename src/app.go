@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"todo-list/src/db"
 	t "todo-list/src/task"
 )
 
@@ -160,7 +161,7 @@ func (m *App) Prev() {
 		m.focused--
 	}
 }
-func (m *App) initList(width, height int, finished func()) {
+func InitAppUI(width, height int) list.Model {
 	defaultList := list.New(
 		[]list.Item{},
 		list.NewDefaultDelegate(),
@@ -242,33 +243,37 @@ func (m *App) initList(width, height int, finished func()) {
 		return extraKeys
 	}
 	defaultList.SetShowHelp(false)
+	return defaultList
+}
+func (m *App) initList(width, height int, finished func()) tea.Cmd {
+	defaultList := InitAppUI(width, height)
 	m.lists = []list.Model{defaultList, defaultList, defaultList}
+	db.Connect()
 
 	m.lists[t.Todo].Title = "To Do"
-	m.lists[t.Todo].SetItems([]list.Item{
-		t.New(t.Todo, "Sleep", "dream some"),
-		t.New(t.Todo, "Idk", "yay"),
-	})
+	todoList := db.GetTasksByColumn(t.Todo)
+	m.lists[t.Todo].SetItems(todoList)
 
 	m.lists[t.InProgress].Title = "In Progress"
-	m.lists[t.InProgress].SetItems([]list.Item{
-		t.New(t.InProgress, "Do something", "buy some groceries"),
-		t.New(t.InProgress, "Do something2", "buy some groceries"),
-	})
+	inProgressList := db.GetTasksByColumn(t.InProgress)
+	m.lists[t.InProgress].SetItems(inProgressList)
 
 	m.lists[t.Done].Title = "Done"
-	m.lists[t.Done].SetItems([]list.Item{
-		t.New(t.Done, "Drink Coffee", "just coffee"),
-	})
-	finished()
+	doneList := db.GetTasksByColumn(t.Done)
+	m.lists[t.Done].SetItems(doneList)
+
+	defer finished()
+	f := func() tea.Cmd {
+		return nil
+	}
+	return f()
 }
 func (m *App) Refresh(list []list.Model) {
 	m.lists = list
 }
 
 func (m *App) Init() tea.Cmd {
-	m.initList(InitWidth, InitHeight, func() {})
-	return m.Spinner.Tick
+	return tea.Batch(m.Spinner.Tick, m.initList(InitWidth, InitHeight, func() {}))
 }
 func (m *App) View() string {
 	if m.quitting {
