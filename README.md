@@ -29,17 +29,7 @@ The edit/add view:
 
 ![Edit](./media/edit.png)
 
-## Demo video
 
-Showing all CRUD operations
-
-> Started deleting old documents from DB
-
-> Created some task
-
-> Edit its collumn
-
-https://user-images.githubusercontent.com/70247653/204107649-d00a7a3c-4555-4d59-88cd-361033f822db.mov
 
 ## High level architecture
 
@@ -62,40 +52,41 @@ to work with MongoDB. For example, we have some functions such as ``TaskCollecti
 The later one is a wonderful one to explain how we work with MongoDB and Go:
 
 ```go
+package db
 
 func GetTasksByColumn(status task.Column) []list.Item {
-if db == nil {
-log.Fatal("You must call connect before getting collections")
-}
-type thisTask struct {
-ID          string `bson:"_id"`
-Index       int
-Status      task.Column
-Title       string
-Description string
-}
-var _tasks []thisTask
-opts := options.Find().SetSort(bson.D{{"index", 1}})
-cursor, err := TaskCollection().Find(context.TODO(), bson.D{{"status", status}}, opts)
-if err != nil {
-log.Fatal(err)
-}
-err = cursor.All(context.TODO(), &_tasks)
-if err != nil {
-log.Fatal(err)
-}
+	if db == nil {
+		log.Fatal("You must call connect before getting collections")
+	}
+	type thisTask struct {
+		ID          string `bson:"_id"`
+		Index       int
+		Status      task.Column
+		Title       string
+		Description string
+	}
+	var _tasks []thisTask
+	opts := options.Find().SetSort(bson.D{{"index", 1}})
+	cursor, err := TaskCollection().Find(context.TODO(), bson.D{{"status", status}}, opts)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = cursor.All(context.TODO(), &_tasks)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-tasks := make([]list.Item, len(_tasks))
+	tasks := make([]list.Item, len(_tasks))
 
-for i, _t := range _tasks {
-_id, err := primitive.ObjectIDFromHex(_t.ID)
-if err != nil {
-fmt.Println("Err:", err)
-}
-tasks[i] = task.NewWithIndex(_t.Status, _t.Title, _t.Description, _t.Index, _id)
-}
+	for i, _t := range _tasks {
+		_id, err := primitive.ObjectIDFromHex(_t.ID)
+		if err != nil {
+			fmt.Println("Err:", err)
+		}
+		tasks[i] = task.NewWithIndex(_t.Status, _t.Title, _t.Description, _t.Index, _id)
+	}
 
-return tasks
+	return tasks
 }
 
 ```
@@ -133,6 +124,20 @@ This file could be called as orchestrator, because it controls other modules and
 around the tasks,
 the ``Update`` function maybe a little chaotic,
 but I can assure to you that it has some kind of organization
+
+
+## Demo video
+
+Showing all CRUD operations
+
+> Started deleting old documents from DB
+
+> Created some task
+
+> Edit its collumn
+
+https://user-images.githubusercontent.com/70247653/204107649-d00a7a3c-4555-4d59-88cd-361033f822db.mov
+
 
 ### Future considerations.
 
