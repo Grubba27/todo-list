@@ -29,8 +29,6 @@ The edit/add view:
 
 ![Edit](./media/edit.png)
 
-
-
 ## High level architecture
 
 ![High level](./media/high-level.png)
@@ -125,19 +123,18 @@ around the tasks,
 the ``Update`` function maybe a little chaotic,
 but I can assure to you that it has some kind of organization
 
-
 ## Demo video
 
 Showing all CRUD operations
-
 > Started deleting old documents from DB
+>
+>  Created some task
+>
+>  Edit its collumn
 
-> Created some task
 
-> Edit its collumn
 
 https://user-images.githubusercontent.com/70247653/204107649-d00a7a3c-4555-4d59-88cd-361033f822db.mov
-
 
 ### Future considerations.
 
