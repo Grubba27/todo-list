@@ -12,7 +12,15 @@ go run .
 
 ## Demo video
 Showing all CRUD operations
-![Demo video](./media/demo-video.mov)
+
+> Started deleting old documents from DB
+
+> Created some task
+
+> Edit its collumn 
+
+https://user-images.githubusercontent.com/70247653/204107649-d00a7a3c-4555-4d59-88cd-361033f822db.mov
+
 
 ## Printscreens
 The laoding view:
@@ -21,7 +29,8 @@ The laoding view:
 The main view:
 ![Todo List](./media/todo-list.png)
 
-The edit view:
+The edit/add view:
+
 ![Edit](./media/edit.png)
 
 
