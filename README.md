@@ -19,7 +19,7 @@ go run .
 
 ## Print screens
 
-The laoding view:
+The loading view:
 ![loading](./media/loading.png)
 
 The main view:
