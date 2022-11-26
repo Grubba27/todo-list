@@ -24,11 +24,8 @@ func NewForm(column task.Column) *Form {
 	return f
 }
 func EditForm(column task.Column, title, description string) *Form {
-	f := &Form{column: column}
-	f.title = textinput.New()
-	f.title.Focus()
+	f := NewForm(column)
 	f.title.SetValue(title)
-	f.description = textarea.New()
 	f.description.SetValue(description)
 	return f
 }
